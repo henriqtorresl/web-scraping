@@ -19,7 +19,7 @@ Este projeto consiste em uma API desenvolvida em Node.js que oferece um endpoint
 Para utilizar a API, basta enviar uma requisição para o endpoint /web-scraping com os parâmetros necessários. Por exemplo:
 
 ```
-GET /web-scraping?url=<URL_DO_PERFIL_LINKEDIN>
+GET /web-scraping?url=<URL_DO_PERFIL_PUBLICO_LINKEDIN>
 ```
 
 A resposta da API conterá os dados extraídos da página pública do LinkedIn no formato JSON.
