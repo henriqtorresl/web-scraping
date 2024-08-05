@@ -11,108 +11,68 @@ app.get('/', (req, res) => {
 })
 
 app.get('/web-scraping', async (req, res) => {
-    // const paginaLinkedin = req.query.url; // pega a url da pagina do linkedin do query param
+    const paginaLinkedin = req.query.url; // pega a url da pagina do linkedin do query param
 
-    // if (paginaLinkedin) {
-    //     const browser = await puppeteer.launch();
-    //     const page = await browser.newPage();
-    //     await page.goto(paginaLinkedin);
-
-    //     const refBotaoFecharModal = await page.$('.modal__dismiss');
-    //     if (refBotaoFecharModal) {
-    //         await page.click('.modal__dismiss');
-    //     }
-    
-    //     const dadosPublicacoes = await page.evaluate(() => {
-    //         const publicacoes = document.querySelectorAll('.updates__list > li.mb-1 > div > article');
-    //         const publicacoesList = [...publicacoes];
-    
-    //         const textos = [];
-    //         const urls = [];
-    //         const midias = [];
-    
-    //         publicacoesList.forEach((publicacao) => {
-    //             const textoElement = publicacao.querySelector('.attributed-text-segment-list__container.relative');
-    //             const texto = textoElement ? textoElement.innerText : '';
-    //             textos.push(texto);
-    
-    //             const mediaElement = publicacao.querySelector('ul > li > img');
-    //             if (mediaElement) {
-    //                 const url = mediaElement.dataset.delayedUrl;
-    //                 urls.push(url);
-    //                 midias.push('imagem');
-    //             } else {
-    //                 const videoElement = publicacao.querySelector('video');
-    //                 if (videoElement) {
-    //                     const jsonString = videoElement.getAttribute('data-sources');
-    //                     const jsonList = JSON.parse(jsonString);
-    //                     const url = jsonList[0].src;
-    //                     urls.push(url);
-    //                     midias.push('video');
-    //                 }
-    //             }
-    //         });
-    
-    //         const dadosPublicacoes = [];
-    //         for (let i = 0; i < publicacoesList.length; i++) {
-    //             dadosPublicacoes.push({
-    //                 texto: textos[i],
-    //                 url: urls[i],
-    //                 tipoMidia: midias[i]
-    //             })
-    //         }
-    
-    //         return dadosPublicacoes;
-    //     });
-    
-    //     // fecha o navegador:
-    //     await browser.close();
-    
-    //     res.send(dadosPublicacoes);
-    // } else {
-    //     res.send({msg: 'Informe a url da página pública do linkedin, para realizar a extração dos dados!'});
-    // }
-            
-
-    const filtroICTS = 'https://news.google.com/search?q=Instituto%20Centro%20de%20Tecnologia%20de%20Software%20-%20ICTS&hl=pt-BR&gl=BR&ceid=BR%3Apt-419';
-
-    const executarScraping = async (filtro, fonte) => {
-        const url = filtro;
-        let browser = null;
-
-     
-        browser = await puppeteer.launch();
-
+    if (paginaLinkedin) {
+        const browser = await puppeteer.launch();
         const page = await browser.newPage();
+        await page.goto(paginaLinkedin);
 
-        await page.goto(url);
-
-        const dadosPesquisa = await page.evaluate(() => {
-            const tituloNoticia = document.querySelectorAll('div.B6pJDd')[0].querySelector('div.IL9Cne > a').innerText;
-            const urlNoticia = 'https://news.google.com' + document.querySelectorAll('div.B6pJDd')[0].querySelector('div.IL9Cne > a').getAttribute('href');
-            const urlImg = 'https://news.google.com' + document.querySelectorAll('div.m5k28')[0].querySelector('figure > img').getAttribute('src');
-
-            return {
-                texto: tituloNoticia,
-                url: urlNoticia,
-                urlImg: urlImg
-            };
-        });
-
-        await browser.close();
-        console.log('Scraping no Google News realizado com sucesso!');
-
-        return {
-            texto: dadosPesquisa.texto,
-            url: dadosPesquisa.url,
-            urlImg: dadosPesquisa.urlImg,
-            fonte: fonte
+        const refBotaoFecharModal = await page.$('.modal__dismiss');
+        if (refBotaoFecharModal) {
+            await page.click('.modal__dismiss');
         }
-    };
-
-    const teste = await executarScraping(filtroICTS);
-
-    res.send(teste);
+    
+        const dadosPublicacoes = await page.evaluate(() => {
+            const publicacoes = document.querySelectorAll('.updates__list > li.mb-1 > div > article');
+            const publicacoesList = [...publicacoes];
+    
+            const textos = [];
+            const urls = [];
+            const midias = [];
+    
+            publicacoesList.forEach((publicacao) => {
+                const textoElement = publicacao.querySelector('.attributed-text-segment-list__container.relative');
+                const texto = textoElement ? textoElement.innerText : '';
+                textos.push(texto);
+    
+                const mediaElement = publicacao.querySelector('ul > li > img');
+                if (mediaElement) {
+                    const url = mediaElement.dataset.delayedUrl;
+                    urls.push(url);
+                    midias.push('imagem');
+                } else {
+                    const videoElement = publicacao.querySelector('video');
+                    if (videoElement) {
+                        const jsonString = videoElement.getAttribute('data-sources');
+                        const jsonList = JSON.parse(jsonString);
+                        const url = jsonList[0].src;
+                        urls.push(url);
+                        midias.push('video');
+                    }
+                }
+            });
+    
+            const dadosPublicacoes = [];
+            for (let i = 0; i < publicacoesList.length; i++) {
+                dadosPublicacoes.push({
+                    texto: textos[i],
+                    url: urls[i],
+                    tipoMidia: midias[i]
+                })
+            }
+    
+            return dadosPublicacoes;
+        });
+    
+        // fecha o navegador:
+        await browser.close();
+    
+        res.send(dadosPublicacoes);
+    } else {
+        res.send({msg: 'Informe a url da página pública do linkedin, para realizar a extração dos dados!'});
+    }
+            
 });
 
 app.listen(port, () => {

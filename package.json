@@ -9,9 +9,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
